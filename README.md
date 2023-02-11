@@ -6,4 +6,5 @@ This pipeline contains 3 files needed for the analysis from fastq files to fold 
 3. fc.analysis.R: Read in the count files and study design matrix to perform fold change analysis between samples and negative control (beads only).
 
 Created by Puwanat Sangkhapreecha
+
 Contact: psangkh1@jhu.edu
