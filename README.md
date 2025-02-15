@@ -27,7 +27,7 @@ For the bash script to run properly,
 
 ### Quick start
 
-In the directory containing MIPSA_preprocessing_alignment.sh, data, and dictionary, run the following command:
+In the directory on Rockfish containing MIPSA_preprocessing_alignment.sh, data, and dictionary, run the following commands:
 
 ```
 chmod +x MIPSA_preprocessing_alignment.sh
@@ -37,6 +37,8 @@ sbatch MIPSA_preprocessing_alignment.sh
 There should be 2 output folders:
 1. `bowtie_output` which contains bam files and `bowtie_results.tsv` which collects the alignment stats from Bowtie
 2. `count_matrix` which contains `merged_barcode_counts.tsv` and `study_design.tsv`
+
+Create a new project in Rstudio and copy the Rmd file into the folder. This can be done locally or on Rockfish as suggested in the [user guide](https://www.arch.jhu.edu/guide/). 
 
 
 
