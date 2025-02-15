@@ -1,6 +1,6 @@
 # mipsa-analysis
 
-This pipeline is used for analyzing immunoprecipitation experiments from [MIPSA]([https://doi.org/10.1101/622803](https://www.nature.com/articles/s41551-022-00925-y)) screening. 
+This pipeline is used for analyzing immunoprecipitation experiments from [MIPSA](https://www.nature.com/articles/s41551-022-00925-y) screening. 
 
 There are 2 files needed for the analysis from fastq.gz files to fold change calculation. 
 1. MIPSA_preprocessing_alignment.sh: Process the raw fastq.gz files from NGS to count matrix for fold change analysis.
