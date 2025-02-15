@@ -1,13 +1,27 @@
-# mipsa-analysis
+## mipsa-analysis
 
 This pipeline is used for analyzing immunoprecipitation experiments from [MIPSA](https://www.nature.com/articles/s41551-022-00925-y) screening. 
 
 There are 2 files needed for the analysis. 
-1. MIPSA_preprocessing_alignment.sh: Process the raw fastq.gz files from NGS and create a count file and study design matrix.
-2. MIPSA_fc_analysis.Rmd: Read in a count file and study design matrix to perform fold change analysis between samples and negative control (beads only).
+1. MIPSA_preprocessing_alignment.sh: Process the raw fastq.gz files from NGS, perform Bowtie alignment, and create a count matrix.
+2. MIPSA_fc_analysis.Rmd: Perform fold change analysis between samples and negative control (beads only).
 
 ## Usage <a name="usage"></a>
 
-Created by Puwanat Sangkhapreecha
+### Installation
 
-Contact: psangkh1@jhu.edu
+```
+git clone https://github.com/puwanat-s/mipsa-analysis
+```
+
+### Prerequisite
+
+For the Larman lab, you need a Rockfish account to run the bash script. 
+
+For the bash script to run properly,
+
+1. fastq.gz files need to be inside a folder name "data"
+2. Name of fastq.gz files need to follow this pattern: MIPSA<number>-<type_of_library>-<sample_name>-<replicate number>
+
+
+Created by Puwanat Sangkhapreecha
