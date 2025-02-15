@@ -6,6 +6,8 @@ There are 2 files needed for the analysis.
 1. MIPSA_preprocessing_alignment.sh: Process the raw fastq.gz files from NGS and create a count file and study design matrix.
 2. MIPSA_fc_analysis.Rmd: Read in a count file and study design matrix to perform fold change analysis between samples and negative control (beads only).
 
+## Usage <a name="usage"></a>
+
 Created by Puwanat Sangkhapreecha
 
 Contact: psangkh1@jhu.edu
