@@ -21,7 +21,18 @@ For the Larman lab, you need a Rockfish account to run the bash script.
 For the bash script to run properly,
 
 1. fastq.gz files need to be inside a folder name "data"
-2. Name of fastq.gz files need to follow this pattern: MIPSA_run-type_of_library-sample_name-replicate number_. For example, MIPSA22-horf-beads-1_S10_R1_001.fastq.gz
+2. Name of fastq.gz files need to follow this pattern: MIPSA22-horf-beads-1_S10_R1_001.fastq.gz. If not, you can change line 86 in the bash script to print the desired sample name and replicate number
+3. Change line 8 in the bash script to your email address
+4. The number of cpus can be adjusted proportionally to the number of fastq.gz files. Change line 5 and 16 to do so.
+5. The preprocessing and alignment run very fast, so the requested time was set for 2 hrs. The time limit can be changed as needed in line 6.
+6. The current dictionary being used is Ultimate Human ORFeome #3, constructed from Oxford Nanopore Sequencing with Minimap2 alignment. If you need to use a different dictionary, please build bowtie indices from Bowtie v.1 and create .fai file using samtools. Store them in a folder name "dictionary"
+
+### Quick start
+
+
+
+
+
 
 
 Created by Puwanat Sangkhapreecha
