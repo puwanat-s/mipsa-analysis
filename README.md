@@ -16,8 +16,6 @@ git clone https://github.com/puwanat-s/mipsa-analysis
 
 ### Prerequisite
 
-For the Larman lab, you need a Rockfish account to run the bash script. 
-
 For the bash script to run properly,
 
 1. fastq.gz files need to be inside a folder name "data"
