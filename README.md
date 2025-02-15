@@ -1,4 +1,4 @@
-## mipsa-analysis
+## MIPSA analysis 
 
 This pipeline is used for analyzing immunoprecipitation experiments from [MIPSA](https://www.nature.com/articles/s41551-022-00925-y) screening. 
 
