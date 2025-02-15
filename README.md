@@ -21,7 +21,7 @@ For the Larman lab, you need a Rockfish account to run the bash script.
 For the bash script to run properly,
 
 1. fastq.gz files need to be inside a folder name "data"
-2. Name of fastq.gz files need to follow this pattern: MIPSA<number>-<type_of_library>-<sample_name>-<replicate number>
+2. Name of fastq.gz files need to follow this pattern: MIPSA{number}-<type_of_library>-<sample_name>-{replicate number}
 
 
 Created by Puwanat Sangkhapreecha
