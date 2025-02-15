@@ -1,0 +1,89 @@
+Using FASTQ file: data/MIPSA22-horf-beads-1_S10_R1_001.fastq.gz
+Sequence length detected: 75
+This is cutadapt 3.2 with Python 3.9.7
+Command line parameters: --cores=8 -u 20 -u -14 -o MIPSA22-horf-beads-1_trimmed.fastq.gz data/MIPSA22-horf-beads-1_S10_R1_001.fastq.gz
+Processing reads on 8 cores in single-end mode ...
+Finished in 1.13 s (1 µs/read; 52.75 M reads/minute).
+
+=== Summary ===
+
+Total reads processed:                 992,553
+Reads with adapters:                         0 (0.0%)
+Reads written (passing filters):       992,553 (100.0%)
+
+Total basepairs processed:    74,441,475 bp
+Total written (filtered):     40,694,673 bp (54.7%)
+This is cutadapt 3.2 with Python 3.9.7
+Command line parameters: --cores=8 -u 20 -u -14 -o MIPSA22-horf-beads-2_trimmed.fastq.gz data/MIPSA22-horf-beads-2_S11_R1_001.fastq.gz
+Processing reads on 8 cores in single-end mode ...
+Finished in 1.16 s (1 µs/read; 43.34 M reads/minute).
+
+=== Summary ===
+
+Total reads processed:                 836,640
+Reads with adapters:                         0 (0.0%)
+Reads written (passing filters):       836,640 (100.0%)
+
+Total basepairs processed:    62,748,000 bp
+Total written (filtered):     34,302,240 bp (54.7%)
+This is cutadapt 3.2 with Python 3.9.7
+Command line parameters: --cores=8 -u 20 -u -14 -o MIPSA22-horf-beads-3_trimmed.fastq.gz data/MIPSA22-horf-beads-3_S12_R1_001.fastq.gz
+Processing reads on 8 cores in single-end mode ...
+Finished in 1.23 s (1 µs/read; 46.01 M reads/minute).
+
+=== Summary ===
+
+Total reads processed:                 942,477
+Reads with adapters:                         0 (0.0%)
+Reads written (passing filters):       942,477 (100.0%)
+
+Total basepairs processed:    70,685,775 bp
+Total written (filtered):     38,641,557 bp (54.7%)
+This is cutadapt 3.2 with Python 3.9.7
+Command line parameters: --cores=8 -u 20 -u -14 -o MIPSA22-horf-franken-1_trimmed.fastq.gz data/MIPSA22-horf-franken-1_S4_R1_001.fastq.gz
+Processing reads on 8 cores in single-end mode ...
+Finished in 1.50 s (1 µs/read; 51.00 M reads/minute).
+
+=== Summary ===
+
+Total reads processed:               1,276,108
+Reads with adapters:                         0 (0.0%)
+Reads written (passing filters):     1,276,108 (100.0%)
+
+Total basepairs processed:    95,708,100 bp
+Total written (filtered):     52,320,428 bp (54.7%)
+This is cutadapt 3.2 with Python 3.9.7
+Command line parameters: --cores=8 -u 20 -u -14 -o MIPSA22-horf-franken-2_trimmed.fastq.gz data/MIPSA22-horf-franken-2_S5_R1_001.fastq.gz
+Processing reads on 8 cores in single-end mode ...
+Finished in 1.79 s (1 µs/read; 41.57 M reads/minute).
+
+=== Summary ===
+
+Total reads processed:               1,239,967
+Reads with adapters:                         0 (0.0%)
+Reads written (passing filters):     1,239,967 (100.0%)
+
+Total basepairs processed:    92,997,525 bp
+Total written (filtered):     50,838,647 bp (54.7%)
+This is cutadapt 3.2 with Python 3.9.7
+Command line parameters: --cores=8 -u 20 -u -14 -o MIPSA22-horf-franken-3_trimmed.fastq.gz data/MIPSA22-horf-franken-3_S6_R1_001.fastq.gz
+Processing reads on 8 cores in single-end mode ...
+Finished in 1.51 s (1 µs/read; 50.80 M reads/minute).
+
+=== Summary ===
+
+Total reads processed:               1,280,290
+Reads with adapters:                         0 (0.0%)
+Reads written (passing filters):     1,280,290 (100.0%)
+
+Total basepairs processed:    96,021,750 bp
+Total written (filtered):     52,491,890 bp (54.7%)
+Bowtie results saved in bowtie_results.tsv
+Processed: MIPSA22-horf-beads-2.bam --> beads_2.tsv
+Processed: MIPSA22-horf-beads-3.bam --> beads_3.tsv
+Processed: MIPSA22-horf-franken-2.bam --> franken_2.tsv
+Processed: MIPSA22-horf-franken-3.bam --> franken_3.tsv
+Processed: MIPSA22-horf-franken-1.bam --> franken_1.tsv
+Processed: MIPSA22-horf-beads-1.bam --> beads_1.tsv
+Barcode count matrix saved as merged_barcode_counts.tsv
+Study design file created: study_design.tsv

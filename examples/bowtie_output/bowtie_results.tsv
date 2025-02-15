@@ -1,0 +1,7 @@
+samples	original_reads	mapped_reads	percent_alignment
+MIPSA22-horf-beads-1	992553	876361	88.29
+MIPSA22-horf-beads-2	836640	739249	88.36
+MIPSA22-horf-beads-3	942477	833755	88.46
+MIPSA22-horf-franken-1	1276108	1133741	88.84
+MIPSA22-horf-franken-2	1239967	1098255	88.57
+MIPSA22-horf-franken-3	1280290	1136047	88.73
