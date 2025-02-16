@@ -45,4 +45,7 @@ The Rmd file contains necessary libraries (e.g., `tidyverse` and `edgeR`) for di
 You can take a look at `MIPSA_fc_analysis.html` for outputs from the codes. Here are some visualizations:
 
 ![scatter plot](https://github.com/puwanat-s/mipsa-analysis/blob/main/examples/visualizations/scatter_plot_franken_beads.png)
+![box plot](https://github.com/puwanat-s/mipsa-analysis/blob/main/examples/visualizations/box_plot_franken_beads.png)
+![violin plot](https://github.com/puwanat-s/mipsa-analysis/blob/main/examples/visualizations/violin_plot_franken_beads.png)
+![heatmap](https://github.com/puwanat-s/mipsa-analysis/blob/main/examples/visualizations/heatmap_franken_beads.png)
 
