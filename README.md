@@ -44,4 +44,5 @@ The Rmd file contains necessary libraries (e.g., `tidyverse` and `edgeR`) for di
 
 You can take a look at `MIPSA_fc_analysis.html` for outputs from the codes. Here are some visualizations:
 
+![scatter plot](https://github.com/puwanat-s/mipsa-analysis/blob/main/examples/visualizations/scatter_plot_franken_beads.png)
 
