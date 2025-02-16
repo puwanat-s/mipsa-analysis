@@ -194,7 +194,7 @@ plot_CPM <- function(dge, dge.log, group1, group2, group1_name, group2_name) {
 plot_CPM(count_dge, count_dge_norm_log, 1, 2, "Beads_only", "Franken")
 ```
 
-From this plot, we see that all TRIM21 barcodes are highly enriched in the Franken group compared to the Beads_only group. This is expected since Franken sample is a mix of patients with autoimmune diseases tested seropositive for TRIM21. 
+From this plot, we see that all TRIM21 barcodes are highly enriched in the Franken group compared to the Beads_only group. This is expected since Franken sample is a mix of patients with autoimmune diseases tested seropositive for TRIM21. You can use this scatterplot to help identify a proper raw count threshold to filter out lowly enriched ORFs.
 
 ## Make boxplot for a specific gene to compare enrichment across groups
 
