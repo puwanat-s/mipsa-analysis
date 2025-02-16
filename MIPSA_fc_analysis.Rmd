@@ -1,0 +1,377 @@
+---
+title: "MIPSA_fc_analysis"
+output: pdf_document
+date: "2025-02-15"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Import libraries
+
+```{r}
+library(tidyverse)
+library(edgeR)
+library(RColorBrewer)
+library(EnhancedVolcano)
+library(ggrepel)
+library(pheatmap)
+```
+
+
+## Import study design
+
+```{r}
+path_to_study_design <- "examples/count_matrix/study_design.tsv"
+study_design <- read_tsv(path_to_study_design, col_names = TRUE)
+colnames(study_design) <- c("samples","group")
+group <- factor(study_design$group)
+design <- model.matrix(~0+group)
+```
+## Import alignment stats from Bowtie
+
+```{r}
+path_to_bowtie_stats <- "examples/bowtie_output/bowtie_results.tsv"
+bowtie_stats <- read_tsv(path_to_bowtie_stats, col_names = TRUE)
+```
+## Import count matrix
+
+```{r}
+count_original_df <- as.data.frame(read_tsv(file = "examples/count_matrix/merged_barcode_counts.tsv", col_names = TRUE)) %>% 
+  separate(col = barcode, into = c("barcode","horf"),sep = "-")
+```
+
+```{r}
+# create a duplicate of the original count matrix
+count_df <- count_original_df
+
+count_df$clean_label <- sapply(strsplit(count_df$horf, "\\|"), function(x) {
+     ifelse(length(x) > 1, paste(x[4], x[1], x[2], sep = "_"), x[1])
+ })
+
+count_df <- count_df %>%
+  group_by(clean_label) %>%
+  mutate(seq = row_number()) %>%
+  ungroup() %>%
+  as.data.frame()
+
+count_df$new_labels <- paste(count_df$clean_label, count_df$seq, sep = "_")
+rownames(count_df) <- count_df$new_labels
+count_df <- count_df[, -which(names(count_df) %in% c("clean_label", "seq", "new_labels"))]
+```
+
+## Create DGEList object for filtering and normalization
+
+```{r}
+count_dge <- DGEList(count_df[,3:ncol(count_df)], group = group)
+nrow(count_dge)
+```
+
+```{r}
+# filtering out low counts
+smallestGroupSize <- 3 # triplicate in this case
+keepers <- rowSums(as.matrix(count_dge) >= 20) >= smallestGroupSize # count threshold = 20
+count_dge <- count_dge[keepers,]
+nrow(count_dge)
+```
+
+The count threshold is very critical for the downstream analysis. We do not to filter too little or too much. Start the threshold at 10 and increase it until the fitted mean-variance trend looks good. Please refer to the following links: <https://f1000research.com/articles/5-1408> and <https://stats.stackexchange.com/questions/160255/voom-mean-variance-trend-plot-how-to-interpret-the-plot> for more information.
+
+```{r}
+# normalize the data based on library size and spiked-in barcode(s) if existed
+count_dge_norm <- calcNormFactors(count_dge, method = "TMM")
+count_dge_norm <- cpm(count_dge_norm, normalized.lib.sizes = TRUE)
+
+# normalize the data using spiked-in "BC_test_1" barcode
+if ("BC_test_1" %in% rownames(count_dge_norm)) {
+  for (i in 1:ncol(orf.dge$counts)) {
+    count_dge_norm$counts[,i] <- count_dge_norm$counts[,i] / count_dge_norm$counts[rownames(count_dge_norm$counts) == "BC_test_1",i] * 10000 # 10,000 molecules of BC_test_1 spiked-in
+  }
+  
+  count_dge_norm$counts <- count_dge_norm$counts[row.names(count_dge_norm$counts) != "BC_test_1",] # remove BC_test row
+} else {
+  print("No spiked-in barcode found in the count matrix")
+}
+
+count_dge_norm_log <- log2(count_dge_norm + 1)
+```
+
+
+## Make MDS plot  
+
+```{r}
+plot_MDS <- function(dge, dge.log) {
+  
+  op <- par(mar = c(5, 4, 4, 12)) # expand the right margin
+
+  ngroups <- length(levels(dge$samples$group))
+  colPalette <- brewer.pal(ngroups, "Paired")
+
+  plotMDS(
+    dge.log,
+    method = "bcv",
+    col    = colPalette[as.numeric(dge$samples$group)],
+    labels = NULL,
+    pch    = 16
+  )
+
+  legend(
+    "topright",
+    inset  = c(-0.5, 0),
+    legend = c("Beads_only", "Franken"),
+    fill   = colPalette,
+    box.col = "white",
+    xpd = TRUE
+  )
+}
+```
+
+```{r}
+plot_MDS(count_dge, count_dge_norm_log)
+```
+
+The MDS plot shows that the samples cluster by group, indicating that the groups are distinct from each other. 
+
+## Make sample-vs-sample scatter plot to identify potential enriched targets 
+
+```{r}
+plot_CPM <- function(dge, dge.log, group1, group2, group1_name, group2_name) {
+
+  group1.log <- dge.log[, dge$samples$group == group1] 
+  group2.log <- dge.log[, dge$samples$group == group2]
+  
+  # Collapse the matrix with replicates into a single column by taking the mean
+  group1.log <- rowMeans(group1.log)
+  group2.log <- rowMeans(group2.log)
+  
+  log2FC <- group2.log - group1.log
+  
+  df <- data.frame(
+    group1 = group1.log,
+    group2 = group2.log,
+    log2FC = log2FC,
+    orf = rownames(dge.log)
+  )
+  
+  df$highlight <- df$log2FC > 2
+  
+  ggplot(df, aes(x = group1, y = group2)) +
+    geom_point(aes(color = highlight), size = 2, alpha = 0.3) +  
+    geom_abline(intercept = 0, slope = 1, linetype = "dashed") +
+    geom_hline(yintercept = 3.3, linetype = "dotted") +   
+    geom_vline(xintercept = 3.3, linetype = "dotted") +
+    scale_color_manual(values = c("FALSE" = "black", "TRUE" = "red")) +  
+    geom_text_repel(
+      data = subset(df, highlight & grepl("TRIM21", orf)),
+      aes(label = orf),
+      size = 2,
+      color = "blue",
+      fontface = "bold", 
+      box.padding = 1.5,
+      point.padding = 0.5,           
+      segment.color = "red",       
+      segment.curvature = -1e-20, 
+      nudge_x = 0.15,
+      nudge_y = 0.5,               
+      arrow = arrow(length = unit(0.015, "npc")),
+      max.overlaps = Inf,          
+      force = 10                   
+    ) +
+    labs(
+      x = group1_name,
+      y = group2_name,
+      color = "log2FC > 2"
+    ) +
+    ggtitle("Log2 Normalized Counts") +
+    theme_minimal()
+}
+```
+
+```{r}
+plot_CPM(count_dge, count_dge_norm_log, 1, 2, "Beads_only", "Franken")
+```
+
+From this plot, we see that all TRIM21 barcodes are highly enriched in the Franken group compared to the Beads_only group. This is expected since Franken sample is a mix of patients with autoimmune diseases tested seropositive for TRIM21. 
+
+## Make boxplot for a specific gene to compare enrichment across groups
+
+```{r}
+plot_boxplot <- function(dge, dge.log, orf) {
+  
+  matches <- grep(orf, rownames(dge.log), value = TRUE)
+  if (length(matches) == 0) {
+    stop(paste("No rows found matching pattern:", orf))
+  }
+
+  counts_mat <- dge.log[matches, , drop = FALSE]
+
+  df <- as.data.frame(counts_mat)
+  df$barcodes <- rownames(df)
+  df_long <- tidyr::pivot_longer(df,
+                                 cols = -barcodes,
+                                 names_to = "sample",
+                                 values_to = "counts")
+
+  sample_df <- data.frame(sample = colnames(dge.log),
+                          group = dge$samples$group,
+                          stringsAsFactors = FALSE) 
+
+  df_long <- left_join(df_long, sample_df, by = "sample")
+  df_long$group <- factor(df_long$group)
+
+  # Perform ANOVA on counts by group
+  aov_fit <- aov(counts ~ group, data = df_long)
+  pval <- summary(aov_fit)[[1]][["Pr(>F)"]][1]
+
+  # Define significance label
+  signif_label <- if (pval < 0.001) {
+    "***"
+  } else if (pval < 0.01) {
+    "**"
+  } else if (pval < 0.05) {
+    "*"
+  } else {
+    "ns"
+  }
+
+  p <- ggplot(df_long, aes(x = group, y = counts)) +
+    geom_boxplot() + 
+    geom_jitter(aes(color = barcodes), width = 0.2, size = 3, alpha = 0.8) +
+    labs(
+      x = "Groups",
+      y = "Log2 Normalized Counts"
+    ) +
+    theme_classic() +
+    theme(
+      text = element_text(size = 14),
+      axis.title = element_text(face = "bold", size = 16),
+      axis.text = element_text(size = 14),
+      plot.title = element_text(face = "bold", hjust = 0.5, size = 18)
+    ) +
+    scale_color_brewer(palette = "Set1")
+
+  # Determine positions for significance annotation
+  groups <- levels(df_long$group)
+  x_start <- 1
+  x_end <- length(groups)
+  y_max <- max(df_long$counts)
+  y_bar <- y_max * 1.05
+  y_text <- y_max * 1.1
+
+  # Add significance bar and annotation text
+  p <- p +
+    geom_segment(aes(x = x_start, xend = x_end, y = y_bar, yend = y_bar), size = 0.8) +
+    geom_text(aes(x = (x_start + x_end) / 2, y = y_text,
+                  label = paste("ANOVA p =", round(pval, 3), signif_label)),
+              size = 5, vjust = 0)
+
+  return(p)
+}
+```
+
+```{r}
+plot_boxplot(count_dge, count_dge_norm_log, "TRIM21")
+```
+
+The replicates are consistent within each barcode, and the overall, the TRIM21 barcodes are significantly enriched in the Franken group compared to the Beads_only group.
+
+## Perform ORFeome-wide differential enrichment analysis
+
+```{r}
+v_count_dge_norm <- voom(count_dge_norm, design, plot = TRUE)
+```
+
+The fitted model looks good, indicating that the raw data was filtered and normalized properly.
+
+```{r}
+# contrast matrix can be adjusted to your desired comparison
+contrasts <- makeContrasts(Franken_vs_Beads_only = (group2) - (group1),
+                           levels = design)
+```
+
+
+```{r}
+fit <- lmFit(v_count_dge_norm, design)
+fits <- contrasts.fit(fit, contrasts)
+ebFit <- eBayes(fits)
+summary(decideTests(ebFit))
+```
+
+```{r}
+Franken_vs_Beads_only <- topTable(ebFit, coef = 1, number = Inf, adjust.method = "BH")
+Franken_vs_Beads_only <- rownames_to_column(Franken_vs_Beads_only, var = "orf")
+```
+
+```{r}
+# Volcano plot
+
+volcano <- function(df) {
+
+  df_name <- deparse(substitute(df))
+
+  # top20_up <- df %>%
+  #   filter(adj.P.Val < 0.05, logFC > 3.3) %>%
+  #   arrange(desc(logFC)) %>%
+  #   head(20)
+
+  # top20_down <- df %>%
+  #   filter(adj.P.Val < 0.05, logFC < -3.3) %>%
+  #   arrange(logFC) %>%
+  #   head(20)
+
+  # orfs_to_label <- c(top20_up$orf, top20_down$orf)
+  orfs_to_label <- df$orf[grepl("TRIM21", df$orf)]
+  
+  EnhancedVolcano(
+    df,
+    title          = df_name,
+    drawConnectors = TRUE,
+    lab            = df$orf,
+    selectLab      = orfs_to_label,
+    x              = "logFC",
+    y              = "adj.P.Val",
+    pCutoff        = 0.05,
+    FCcutoff       = 3.3,
+    pointSize      = 4,
+    labSize        = 3.5, 
+    legendPosition = 'right',
+    legendLabSize  = 20,
+    legendIconSize = 5.0,
+    lengthConnectors = unit(0.01, "npc"),
+    max.overlaps   = Inf,
+    labFace        = "bold",  
+    boxedLabels    = TRUE)
+
+}
+```
+
+```{r fig.height=10}
+volcano(Franken_vs_Beads_only)
+```
+
+With adj.P.Val < 0.05, and logFC > 3.3, we only have ORFs enriched in the Franken group (assuming that beads_only does not enrich any ORFs). All TRIM21 barcodes are labelled. 
+
+
+```{r fig.height=10}
+
+df_diff <- topTable(ebFit, number = Inf, adjust.method = "BH", p.value = 0.05, lfc = 3.3)
+heatmap_data <- count_dge_norm_log[rownames(df_diff), ]
+sample_annotation <- data.frame(Group = count_dge$samples$group)
+rownames(sample_annotation) <- colnames(count_dge_norm_log)
+
+pheatmap(t(heatmap_data),
+         annotation_row = sample_annotation,
+         cluster_rows = TRUE,
+         cluster_cols = TRUE,
+         show_rownames = TRUE,  
+         show_colnames = TRUE,  
+         fontsize_row = 12,
+         fontsize_col = 12,
+         cellheight = 20,  
+         cellwidth = 15,
+         angle_col = 45)
+```
+
+The heatmap shows the log2 normalized counts of the top differentially enriched ORFs (adj.P.Val < 0.05 and logFC > 3.3). Other autoantigens, such as RPL12, TROVE2, and SMN2, are also enriched in the Franken group.
+
