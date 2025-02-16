@@ -40,7 +40,7 @@ There should be 2 output folders:
 
 Create a new project in Rstudio and copy the Rmd file into the folder. This can be done locally or on Rockfish as suggested in the [user guide](https://www.arch.jhu.edu/guide/). 
 
-The Rmd file contains necessary libraries (e.g., `tidyverse` and `edgeR`) for differential analysis to identify statistically significant enriched targets. It can also generate plots, such as sample-vs-sample scatter plot, MDS plot, and volcano plot. Details can be found in the file. Please feel free to add visualizations for your own investigation! 
+The Rmd file contains necessary libraries (e.g., `tidyverse` and `edgeR`) for differential analysis to identify statistically significant enriched targets. It can also generate plots, such as sample-vs-sample scatter plot, MDS plot, heatmap, and volcano plot. Details can be found in the file. Please feel free to add visualizations for your own investigation! 
 
 You can take a look at `MIPSA_fc_analysis.html` for outputs from the codes. Here are some visualizations:
 
