@@ -1,6 +1,8 @@
 ---
 title: "MIPSA_fc_analysis"
-output: pdf_document
+output:
+  html_document:
+    df_print: paged
 date: "2025-02-15"
 ---
 
@@ -236,7 +238,7 @@ plot_boxplot <- function(dge, dge.log, orf) {
   }
 
   p <- ggplot(df_long, aes(x = group, y = counts)) +
-    geom_boxplot() + 
+    geom_boxplot(outlier.shape = NA) + 
     geom_jitter(aes(color = barcodes), width = 0.2, size = 3, alpha = 0.8) +
     labs(
       x = "Groups",
@@ -263,7 +265,7 @@ plot_boxplot <- function(dge, dge.log, orf) {
   p <- p +
     geom_segment(aes(x = x_start, xend = x_end, y = y_bar, yend = y_bar), size = 0.8) +
     geom_text(aes(x = (x_start + x_end) / 2, y = y_text,
-                  label = paste("ANOVA p =", round(pval, 3), signif_label)),
+                  label = signif_label),
               size = 5, vjust = 0)
 
   return(p)
@@ -323,7 +325,7 @@ volcano <- function(df) {
   # orfs_to_label <- c(top20_up$orf, top20_down$orf)
   orfs_to_label <- df$orf[grepl("TRIM21", df$orf)]
   
-  EnhancedVolcano(
+ p <- EnhancedVolcano(
     df,
     title          = df_name,
     drawConnectors = TRUE,
@@ -333,27 +335,34 @@ volcano <- function(df) {
     y              = "adj.P.Val",
     pCutoff        = 0.05,
     FCcutoff       = 3.3,
-    pointSize      = 4,
-    labSize        = 3.5, 
+    pointSize      = 2,
+    labSize        = 2, 
     legendPosition = 'right',
-    legendLabSize  = 20,
-    legendIconSize = 5.0,
+    legendLabSize  = 10,
+    legendIconSize = 2.0,
     lengthConnectors = unit(0.01, "npc"),
     max.overlaps   = Inf,
     labFace        = "bold",  
     boxedLabels    = TRUE)
 
+  p <- p + ggplot2::theme(
+    plot.title = ggplot2::element_text(size = 15, face = "bold", hjust = 0.5),
+    axis.title.x = ggplot2::element_text(size = 15, face = "bold"),
+    axis.title.y = ggplot2::element_text(size = 15, face = "bold")
+  )
+  
+  return(p)
 }
 ```
 
-```{r fig.height=10}
+```{r}
 volcano(Franken_vs_Beads_only)
 ```
 
 With adj.P.Val < 0.05, and logFC > 3.3, we only have ORFs enriched in the Franken group (assuming that beads_only does not enrich any ORFs). All TRIM21 barcodes are labelled. 
 
 
-```{r fig.height=10}
+```{r fig.width=20, fig.height=5, out.width="100%"}
 
 df_diff <- topTable(ebFit, number = Inf, adjust.method = "BH", p.value = 0.05, lfc = 3.3)
 heatmap_data <- count_dge_norm_log[rownames(df_diff), ]
